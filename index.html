@@ -169,14 +169,25 @@
     lastResult = '';
   }
 
-  function showResult(url, toPlatform) {
+  function showResult(url, toPlatform, searchHint) {
     spinner.classList.remove('visible');
     outputBox.className = 'output-box is-' + toPlatform;
-    outputText.textContent = url;
-    outputText.className = 'output-text';
-    copyBtn.style.display = 'flex';
-    copyBtn.className = 'copy-btn';
     lastResult = url;
+    if (searchHint) {
+      // Show as clickable search link instead of raw URL
+      outputText.textContent = searchHint;
+      outputText.className = 'output-text search-hint';
+      outputText.style.cursor = 'pointer';
+      outputText.onclick = () => window.open(url, '_blank');
+      copyBtn.style.display = 'none';
+    } else {
+      outputText.textContent = url;
+      outputText.className = 'output-text';
+      outputText.style.cursor = '';
+      outputText.onclick = null;
+      copyBtn.style.display = 'flex';
+      copyBtn.className = 'copy-btn';
+    }
   }
 
   function showError(msg) {
@@ -213,7 +224,7 @@
       if (data.error) throw new Error(data.error);
       if (!data.url) throw new Error('Kein Link gefunden.');
       const toPlatform = platform === 'spotify' ? 'apple' : 'spotify';
-      showResult(data.url, toPlatform);
+      showResult(data.url, toPlatform, data.isSearch ? `↗ Spotify-Suche öffnen: ${data.title}` : null);
     } catch (err) {
       showError('⚠ ' + (err.message || 'something went wrong'));
     }
