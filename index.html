@@ -208,21 +208,12 @@
     if (!platform) return;
     showLoading(platform);
     try {
-      const res = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}&userCountry=DE`);
-      if (!res.ok) throw new Error('API error ' + res.status);
+      const res = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}`);
       const data = await res.json();
-      const platforms = data.linksByPlatform || {};
-      let link, toPlatform;
-      if (platform === 'spotify') {
-        // Try appleMusic first, fall back to itunes
-        link = platforms['appleMusic']?.url || platforms['itunes']?.url;
-        toPlatform = 'apple';
-      } else {
-        link = platforms['spotify']?.url;
-        toPlatform = 'spotify';
-      }
-      if (!link) throw new Error('Kein Link gefunden — dieser Track ist auf der Zielplattform möglicherweise nicht verfügbar.');
-      showResult(link, toPlatform);
+      if (data.error) throw new Error(data.error);
+      if (!data.url) throw new Error('Kein Link gefunden.');
+      const toPlatform = platform === 'spotify' ? 'apple' : 'spotify';
+      showResult(data.url, toPlatform);
     } catch (err) {
       showError('⚠ ' + (err.message || 'something went wrong'));
     }
