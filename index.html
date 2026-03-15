@@ -10,61 +10,119 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0a0a0a; --surface: #111111; --border: #222222;
+      --bg: #0a0a0a; --surface: #111111; --border: #1e1e1e;
       --text: #e8e8e8; --muted: #555555;
       --spotify: #1DB954; --apple: #fc3c44;
     }
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; }
     body::before {
       content: ''; position: fixed; inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
       background-size: 60px 60px; pointer-events: none;
     }
     .page { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 56px; animation: fadeUp 0.5s ease both; }
+
+    header { text-align: center; margin-bottom: 52px; animation: fadeUp 0.5s ease both; }
     .wordmark { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(2.2rem, 5vw, 3.2rem); letter-spacing: -0.02em; line-height: 1; }
     .tagline { margin-top: 10px; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
-    .card { width: 100%; max-width: 520px; animation: fadeUp 0.5s 0.1s ease both; }
-    .field-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
-    .field-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; flex-shrink: 0; }
-    .field-label.is-spotify .dot { background: var(--spotify); }
-    .field-label.is-spotify { color: var(--spotify); }
-    .field-label.is-apple .dot { background: var(--apple); }
-    .field-label.is-apple { color: var(--apple); }
+
+    .card { width: 100%; max-width: 540px; animation: fadeUp 0.5s 0.1s ease both; }
+
+    /* ── Input ── */
+    .input-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+    .input-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; flex-shrink: 0; }
+    .input-label.is-spotify { color: var(--spotify); }
+    .input-label.is-spotify .dot { background: var(--spotify); }
+    .input-label.is-apple { color: var(--apple); }
+    .input-label.is-apple .dot { background: var(--apple); }
+
     .input-wrap { position: relative; }
-    textarea { width: 100%; height: 76px; resize: none; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px 48px 16px 16px; font-family: 'DM Mono', monospace; font-size: 0.76rem; color: var(--text); outline: none; transition: border-color 0.25s, box-shadow 0.25s; line-height: 1.5; word-break: break-all; }
+    textarea {
+      width: 100%; height: 72px; resize: none;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 44px 16px 16px;
+      font-family: 'DM Mono', monospace; font-size: 0.76rem; color: var(--text);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.5; word-break: break-all;
+    }
     textarea::placeholder { color: var(--muted); }
-    textarea.is-spotify { border-color: rgba(29,185,84,0.35); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
-    textarea.is-apple   { border-color: rgba(252,60,68,0.35);  box-shadow: 0 0 0 3px rgba(252,60,68,0.1); }
-    .clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: color 0.2s; display: none; }
+    textarea.is-spotify { border-color: rgba(29,185,84,0.4); box-shadow: 0 0 0 3px rgba(29,185,84,0.08); }
+    textarea.is-apple   { border-color: rgba(252,60,68,0.4);  box-shadow: 0 0 0 3px rgba(252,60,68,0.08); }
+
+    .clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 6px; color: var(--muted); display: none; }
     .clear-btn.visible { display: flex; }
     .clear-btn:hover { color: var(--text); }
-    .arrow-divider { display: flex; align-items: center; justify-content: center; margin: 24px 0; opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
-    .arrow-divider.visible { opacity: 1; transform: none; }
-    .arrow-line { flex: 1; height: 1px; background: var(--border); }
-    .arrow-icon { margin: 0 16px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .chevron { width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg); opacity: 0.35; }
-    .output-wrap { opacity: 0; transform: translateY(8px); transition: opacity 0.35s, transform 0.35s; pointer-events: none; }
-    .output-wrap.visible { opacity: 1; transform: none; pointer-events: all; }
-    .output-box { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px 52px 16px 16px; min-height: 76px; display: flex; align-items: center; transition: border-color 0.3s, box-shadow 0.3s; }
-    .output-box.is-spotify { border-color: rgba(29,185,84,0.35); box-shadow: 0 0 0 3px rgba(29,185,84,0.1); }
-    .output-box.is-apple   { border-color: rgba(252,60,68,0.35);  box-shadow: 0 0 0 3px rgba(252,60,68,0.1); }
-    .output-text { font-size: 0.76rem; line-height: 1.5; word-break: break-all; color: var(--text); flex: 1; }
-    .output-text.loading { color: var(--muted); font-style: italic; }
-    .output-text.error { color: var(--apple); }
-    .copy-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: color 0.2s; display: flex; }
-    .copy-btn:hover { color: var(--text); }
-    .copy-btn.copied { color: var(--spotify); }
-    .copy-btn.copied-apple { color: var(--apple); }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner { width: 13px; height: 13px; border: 1.5px solid #333; border-top-color: var(--muted); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-    .spinner.visible { display: block; }
-    .setup-hint { margin-top: 20px; padding: 14px 16px; background: rgba(255,200,0,0.05); border: 1px solid rgba(255,200,0,0.15); border-radius: 6px; font-size: 0.64rem; line-height: 1.7; color: #999; display: none; }
-    .setup-hint.visible { display: block; }
-    .setup-hint code { color: #ffc800; background: rgba(255,200,0,0.1); padding: 1px 5px; border-radius: 3px; }
-    footer { margin-top: 52px; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.45; animation: fadeUp 0.5s 0.2s ease both; }
+
+    /* ── Divider ── */
+    .divider { display: flex; align-items: center; margin: 22px 0; opacity: 0; transition: opacity 0.3s; }
+    .divider.visible { opacity: 1; }
+    .div-line { flex: 1; height: 1px; background: var(--border); }
+    .div-icon { margin: 0 14px; display: flex; flex-direction: column; gap: 3px; align-items: center; }
+    .chev { width: 7px; height: 7px; border-right: 1.5px solid #333; border-bottom: 1.5px solid #333; transform: rotate(45deg); }
+
+    /* ── Results card ── */
+    .results-wrap { opacity: 0; transform: translateY(8px); transition: opacity 0.35s, transform 0.35s; pointer-events: none; }
+    .results-wrap.visible { opacity: 1; transform: none; pointer-events: all; }
+
+    .results-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .result-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      min-height: 56px;
+    }
+    .result-row:last-child { border-bottom: none; }
+
+    .result-platform {
+      font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase;
+      white-space: nowrap; display: flex; align-items: center; gap: 6px;
+      min-width: 90px;
+    }
+    .result-platform .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .dot-spotify { background: var(--spotify); }
+    .dot-apple   { background: var(--apple); }
+    .result-platform.spotify { color: var(--spotify); }
+    .result-platform.apple   { color: var(--apple); }
+
+    .result-url {
+      font-size: 0.7rem; color: var(--text); word-break: break-all; flex: 1;
+      line-height: 1.4; opacity: 0.7;
+    }
+    .result-url.search { color: var(--muted); font-style: italic; cursor: pointer; opacity: 1; }
+    .result-url.search:hover { color: var(--text); }
+    .result-url.empty { color: var(--muted); font-style: italic; }
+
+    .spinner-inline {
+      width: 12px; height: 12px; flex-shrink: 0;
+      border: 1.5px solid #2a2a2a; border-top-color: #555;
+      border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+    }
+    .spinner-inline.visible { display: block; }
+
+    /* ── Copy-all button ── */
+    .copy-all-wrap { margin-top: 14px; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+    .copy-all-wrap.visible { opacity: 1; }
+
+    .copy-all-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px 24px; font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .copy-all-btn:hover { border-color: #444; color: var(--text); }
+    .copy-all-btn.copied { border-color: var(--spotify); color: var(--spotify); }
+
+    footer { margin-top: 48px; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.4; animation: fadeUp 0.5s 0.2s ease both; }
     footer a { color: inherit; text-decoration: none; }
+
     @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin   { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -73,51 +131,59 @@
     <div class="wordmark">linkbridge</div>
     <div class="tagline">spotify · apple music · converter</div>
   </header>
-  <div class="card">
 
-    <!-- ⚠️ Replace with your Cloudflare Worker URL -->
-    <!-- Example: https://linkbridge.your-name.workers.dev -->
+  <div class="card">
     <script>
       const PROXY_URL = "https://black-river-1f93linkbridge-proxy.leonmuehlenbruch.workers.dev";
     </script>
 
-    <div class="field-label" id="input-label">
+    <!-- Input -->
+    <div class="input-label" id="input-label">
       <span class="dot"></span>
       <span id="label-text">paste a spotify or apple music link</span>
     </div>
     <div class="input-wrap">
       <textarea id="link-input" placeholder="https://…" spellcheck="false" autocomplete="off"></textarea>
       <button class="clear-btn" id="clear-btn" onclick="clearAll()" title="Clear">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
 
-    <div class="arrow-divider" id="arrow">
-      <div class="arrow-line"></div>
-      <div class="arrow-icon"><span class="chevron"></span><span class="chevron"></span></div>
-      <div class="arrow-line"></div>
+    <!-- Divider -->
+    <div class="divider" id="divider">
+      <div class="div-line"></div>
+      <div class="div-icon"><span class="chev"></span><span class="chev"></span></div>
+      <div class="div-line"></div>
     </div>
 
-    <div class="output-wrap" id="output-wrap">
-      <div class="field-label" id="output-label">
-        <span class="dot"></span>
-        <span id="output-label-text">converting…</span>
+    <!-- Results -->
+    <div class="results-wrap" id="results-wrap">
+      <div class="results-card">
+        <!-- Spotify row -->
+        <div class="result-row">
+          <div class="result-platform spotify"><span class="dot dot-spotify"></span>Spotify</div>
+          <div class="spinner-inline" id="sp-spinner"></div>
+          <div class="result-url empty" id="sp-url">—</div>
+        </div>
+        <!-- Apple Music row -->
+        <div class="result-row">
+          <div class="result-platform apple"><span class="dot dot-apple"></span>Apple Music</div>
+          <div class="spinner-inline" id="ap-spinner"></div>
+          <div class="result-url empty" id="ap-url">—</div>
+        </div>
       </div>
-      <div class="output-box" id="output-box">
-        <div class="spinner" id="spinner"></div>
-        <span class="output-text loading" id="output-text"></span>
-        <button class="copy-btn" id="copy-btn" onclick="copyResult()" title="Copy" style="display:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+      <!-- Copy both button -->
+      <div class="copy-all-wrap" id="copy-all-wrap">
+        <button class="copy-all-btn" id="copy-all-btn" onclick="copyAll()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
           </svg>
+          Copy both links
         </button>
       </div>
-    </div>
-
-    <div class="setup-hint" id="setup-hint">
-      ⚠ Worker URL not configured — open <code>index.html</code> and replace <code>YOUR-WORKER.workers.dev</code> with your Cloudflare Worker URL.
     </div>
   </div>
 
@@ -125,92 +191,100 @@
 </div>
 
 <script>
-  let debounceTimer = null, lastResult = '';
-  const input = document.getElementById('link-input');
-  const inputLabel = document.getElementById('input-label');
-  const labelText = document.getElementById('label-text');
-  const clearBtn = document.getElementById('clear-btn');
-  const arrow = document.getElementById('arrow');
-  const outputWrap = document.getElementById('output-wrap');
-  const outputBox = document.getElementById('output-box');
-  const outputLabel = document.getElementById('output-label');
-  const outputLabelText = document.getElementById('output-label-text');
-  const outputText = document.getElementById('output-text');
-  const spinner = document.getElementById('spinner');
-  const copyBtn = document.getElementById('copy-btn');
-  const setupHint = document.getElementById('setup-hint');
+  let debounce = null;
+  let state = { spotify: null, apple: null, spotifySearch: false, title: null };
 
-  // Show warning if proxy not configured
-  if (PROXY_URL.includes("YOUR-WORKER")) {
-    setupHint.classList.add('visible');
-  }
+  const input      = document.getElementById('link-input');
+  const inputLabel = document.getElementById('input-label');
+  const labelText  = document.getElementById('label-text');
+  const clearBtn   = document.getElementById('clear-btn');
+  const divider    = document.getElementById('divider');
+  const resultsWrap= document.getElementById('results-wrap');
+  const spUrl      = document.getElementById('sp-url');
+  const apUrl      = document.getElementById('ap-url');
+  const spSpinner  = document.getElementById('sp-spinner');
+  const apSpinner  = document.getElementById('ap-spinner');
+  const copyAllWrap= document.getElementById('copy-all-wrap');
+  const copyAllBtn = document.getElementById('copy-all-btn');
 
   function detectPlatform(url) {
-    if (/open\.spotify\.com/i.test(url)) return 'spotify';
-    if (/music\.apple\.com/i.test(url)) return 'apple';
+    if (/open\.spotify\.com/i.test(url))  return 'spotify';
+    if (/music\.apple\.com/i.test(url))   return 'apple';
     return null;
   }
 
-  function showLoading(fromPlatform) {
-    const toPlatform = fromPlatform === 'spotify' ? 'apple' : 'spotify';
-    input.className = 'is-' + fromPlatform;
-    inputLabel.className = 'field-label is-' + fromPlatform;
-    labelText.textContent = fromPlatform === 'spotify' ? 'spotify link' : 'apple music link';
+  function showLoading(platform) {
+    input.className = 'is-' + platform;
+    inputLabel.className = 'input-label is-' + platform;
+    labelText.textContent = platform === 'spotify' ? 'spotify link' : 'apple music link';
     clearBtn.classList.add('visible');
-    arrow.classList.add('visible');
-    outputWrap.classList.add('visible');
-    outputLabel.className = 'field-label is-' + toPlatform;
-    outputLabelText.textContent = toPlatform === 'spotify' ? 'spotify link' : 'apple music link';
-    outputBox.className = 'output-box';
-    spinner.classList.add('visible');
-    outputText.textContent = '';
-    outputText.className = 'output-text loading';
-    copyBtn.style.display = 'none';
-    lastResult = '';
+    divider.classList.add('visible');
+    resultsWrap.classList.add('visible');
+    copyAllWrap.classList.remove('visible');
+
+    spUrl.textContent = ''; spUrl.className = 'result-url empty'; spUrl.onclick = null;
+    apUrl.textContent = ''; apUrl.className = 'result-url empty'; apUrl.onclick = null;
+    spSpinner.classList.add('visible');
+    apSpinner.classList.add('visible');
+    state = { spotify: null, apple: null, spotifySearch: false };
   }
 
-  function showResult(url, toPlatform, searchHint) {
-    spinner.classList.remove('visible');
-    outputBox.className = 'output-box is-' + toPlatform;
-    lastResult = url;
-    if (searchHint) {
-      // Show as clickable search link instead of raw URL
-      outputText.textContent = searchHint;
-      outputText.className = 'output-text search-hint';
-      outputText.style.cursor = 'pointer';
-      outputText.onclick = () => window.open(url, '_blank');
-      copyBtn.style.display = 'none';
+  function showResults(data) {
+    spSpinner.classList.remove('visible');
+    apSpinner.classList.remove('visible');
+
+    state.spotify      = data.spotify;
+    state.apple        = data.apple;
+    state.spotifySearch= data.spotifySearch;
+    state.title        = data.title;
+
+    // Spotify
+    if (data.spotify) {
+      if (data.spotifySearch) {
+        spUrl.textContent = `↗ search: ${data.title || 'open spotify'}`;
+        spUrl.className   = 'result-url search';
+        spUrl.onclick     = () => window.open(data.spotify, '_blank');
+      } else {
+        spUrl.textContent = data.spotify;
+        spUrl.className   = 'result-url';
+      }
     } else {
-      outputText.textContent = url;
-      outputText.className = 'output-text';
-      outputText.style.cursor = '';
-      outputText.onclick = null;
-      copyBtn.style.display = 'flex';
-      copyBtn.className = 'copy-btn';
+      spUrl.textContent = 'not found';
+      spUrl.className   = 'result-url empty';
+    }
+
+    // Apple Music
+    if (data.apple) {
+      apUrl.textContent = data.apple;
+      apUrl.className   = 'result-url';
+    } else {
+      apUrl.textContent = 'not found';
+      apUrl.className   = 'result-url empty';
+    }
+
+    // Show copy button if at least one link exists
+    if (data.spotify || data.apple) {
+      copyAllWrap.classList.add('visible');
     }
   }
 
   function showError(msg) {
-    spinner.classList.remove('visible');
-    outputBox.className = 'output-box is-apple';
-    outputText.textContent = msg;
-    outputText.className = 'output-text error';
-    copyBtn.style.display = 'none';
-    lastResult = '';
+    spSpinner.classList.remove('visible');
+    apSpinner.classList.remove('visible');
+    spUrl.textContent = msg; spUrl.className = 'result-url empty';
+    apUrl.textContent = msg; apUrl.className = 'result-url empty';
   }
 
   function clearAll() {
     input.value = '';
     input.className = '';
-    inputLabel.className = 'field-label';
+    inputLabel.className = 'input-label';
     labelText.textContent = 'paste a spotify or apple music link';
     clearBtn.classList.remove('visible');
-    arrow.classList.remove('visible');
-    outputWrap.classList.remove('visible');
-    spinner.classList.remove('visible');
-    outputText.textContent = '';
-    copyBtn.style.display = 'none';
-    lastResult = '';
+    divider.classList.remove('visible');
+    resultsWrap.classList.remove('visible');
+    copyAllWrap.classList.remove('visible');
+    state = { spotify: null, apple: null };
     input.focus();
   }
 
@@ -219,36 +293,44 @@
     if (!platform) return;
     showLoading(platform);
     try {
-      const res = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}`);
+      const res  = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}`);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      if (!data.url) throw new Error('Kein Link gefunden.');
-      const toPlatform = platform === 'spotify' ? 'apple' : 'spotify';
-      showResult(data.url, toPlatform, data.isSearch ? `↗ Spotify-Suche öffnen: ${data.title}` : null);
+      showResults(data);
     } catch (err) {
       showError('⚠ ' + (err.message || 'something went wrong'));
     }
   }
 
   function onInput() {
-    clearTimeout(debounceTimer);
+    clearTimeout(debounce);
     const val = input.value.trim();
     if (!val) { clearAll(); return; }
     const platform = detectPlatform(val);
     clearBtn.classList.add('visible');
-    if (!platform) { input.className = ''; inputLabel.className = 'field-label'; labelText.textContent = 'paste a spotify or apple music link'; return; }
-    debounceTimer = setTimeout(() => convert(val), 500);
+    if (!platform) { input.className = ''; return; }
+    debounce = setTimeout(() => convert(val), 500);
   }
 
   input.addEventListener('input', onInput);
   input.addEventListener('paste', () => setTimeout(onInput, 30));
 
-  function copyResult() {
-    if (!lastResult) return;
-    navigator.clipboard.writeText(lastResult).then(() => {
-      const toPlatform = outputBox.classList.contains('is-apple') ? 'apple' : 'spotify';
-      copyBtn.className = 'copy-btn copied' + (toPlatform === 'apple' ? '-apple' : '');
-      setTimeout(() => copyBtn.className = 'copy-btn', 1500);
+  function copyAll() {
+    const lines = [];
+    if (state.spotify && !state.spotifySearch) lines.push(`Spotify: ${state.spotify}`);
+    if (state.spotify && state.spotifySearch)  lines.push(`Spotify: ${state.spotify} (search)`);
+    if (state.apple)                            lines.push(`Apple Music: ${state.apple}`);
+    if (!lines.length) return;
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      copyAllBtn.classList.add('copied');
+      copyAllBtn.querySelector('span') && null;
+      const orig = copyAllBtn.innerHTML;
+      copyAllBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+      setTimeout(() => {
+        copyAllBtn.innerHTML = orig;
+        copyAllBtn.classList.remove('copied');
+      }, 2000);
     });
   }
 </script>
