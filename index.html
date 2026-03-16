@@ -192,7 +192,7 @@
 
 <script>
   let debounce = null;
-  let state = { spotify: null, apple: null, spotifySearch: false, title: null };
+  let state = { spotify: null, apple: null, title: null };
 
   const input      = document.getElementById('link-input');
   const inputLabel = document.getElementById('input-label');
@@ -226,28 +226,22 @@
     apUrl.textContent = ''; apUrl.className = 'result-url empty'; apUrl.onclick = null;
     spSpinner.classList.add('visible');
     apSpinner.classList.add('visible');
-    state = { spotify: null, apple: null, spotifySearch: false };
+    state = { spotify: null, apple: null };
   }
 
   function showResults(data) {
     spSpinner.classList.remove('visible');
     apSpinner.classList.remove('visible');
 
-    state.spotify      = data.spotify;
-    state.apple        = data.apple;
-    state.spotifySearch= data.spotifySearch;
-    state.title        = data.title;
+    state.spotify = data.spotify;
+    state.apple   = data.apple;
+    state.title   = data.title;
 
     // Spotify
     if (data.spotify) {
-      if (data.spotifySearch) {
-        spUrl.textContent = `↗ search: ${data.title || 'open spotify'}`;
-        spUrl.className   = 'result-url search';
-        spUrl.onclick     = () => window.open(data.spotify, '_blank');
-      } else {
-        spUrl.textContent = data.spotify;
-        spUrl.className   = 'result-url';
-      }
+      spUrl.textContent = data.spotify;
+      spUrl.className   = 'result-url';
+      spUrl.onclick     = null;
     } else {
       spUrl.textContent = 'not found';
       spUrl.className   = 'result-url empty';
@@ -317,9 +311,8 @@
 
   function copyAll() {
     const lines = [];
-    if (state.spotify && !state.spotifySearch) lines.push(`Spotify: ${state.spotify}`);
-    if (state.spotify && state.spotifySearch)  lines.push(`Spotify: ${state.spotify} (search)`);
-    if (state.apple)                            lines.push(`Apple Music: ${state.apple}`);
+    if (state.spotify) lines.push(`Spotify: ${state.spotify}`);
+    if (state.apple)   lines.push(`Apple Music: ${state.apple}`);
     if (!lines.length) return;
 
     navigator.clipboard.writeText(lines.join('\n')).then(() => {
